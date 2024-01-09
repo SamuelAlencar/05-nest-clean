@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Body, ConflictException, Controller, HttpCode, Post } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 
@@ -8,7 +7,7 @@ export class CreateAccountController {
 
   @Post()
   @HttpCode(201)
-  async handle (@Body() body: any) {
+  async handle (@Body() body: unknown) {
     const { name, email, password } = body
 
     const userWithSameEmail = await this.prisma.user.findUnique({
