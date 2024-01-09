@@ -1,8 +1,18 @@
 {
-    "extends": "@rocketseat/eslint-config/node",
-    "rules": {
-        "no-useless-constructor": "off",
-        "@typescript-eslint/explicit-function-return-type": "off"       
-        
-    }   
+  "extends": "@rocketseat/eslint-config/node",
+  "rules": {
+    "no-useless-constructor": "off",
+    "no-new": "off",
+    "@typescript-eslint/explicit-function-return-type": "ES2021" 
+  },
+  "overrides": [
+    {
+      // enable the rule specifically for TypeScript files
+      "files": ["*.ts", "*.mts", "*.cts", "*.tsx"],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": "off"
+      }
+    }
+  ]
+
 }
