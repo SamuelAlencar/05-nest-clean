@@ -8,14 +8,23 @@ Este é um projeto de fórum online desenvolvido utilizando o framework Nest.js.
 
 ## Tecnologias Utilizadas
 - [Nest.js](https://nestjs.com/) - Framework para construção de aplicativos server-side em Node.js.
+  ![Nest.js](https://img.shields.io/badge/Nest.js-%E2%9C%94-green)
 - [Prisma](https://www.prisma.io/) - ORM (Object-Relational Mapping) para Node.js e TypeScript.
+  ![Prisma](https://img.shields.io/badge/Prisma-%E2%9C%94-blue)
 - [AWS SDK](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/index.html) - Biblioteca para interagir com serviços da AWS, utilizado aqui para integração com o Amazon S3.
+  ![AWS SDK](https://img.shields.io/badge/AWS%20SDK-%E2%9C%94-orange)
 - [bcryptjs](https://github.com/dcodeIO/bcrypt.js) - Biblioteca para hashing de senhas.
+  ![bcryptjs](https://img.shields.io/badge/bcryptjs-%E2%9C%94-yellow)
 - [Day.js](https://day.js.org/) - Manipulação de datas leve.
+  ![Day.js](https://img.shields.io/badge/Day.js-%E2%9C%94-lightgrey)
 - [Ioredis](https://github.com/luin/ioredis) - Cliente Redis para Node.js.
+  ![Ioredis](https://img.shields.io/badge/Ioredis-%E2%9C%94-red)
 - [Passport](http://www.passportjs.org/) - Middleware de autenticação para Node.js.
+  ![Passport](https://img.shields.io/badge/Passport-%E2%9C%94-blueviolet)
 - [Zod](https://github.com/colinhacks/zod) - Biblioteca para validação de esquemas em TypeScript.
+  ![Zod](https://img.shields.io/badge/Zod-%E2%9C%94-ff69b4)
 - [Vitest](https://github.com/vitesse/vitest) - Framework de testes para Vite.
+  ![Vitest](https://img.shields.io/badge/Vitest-%E2%9C%94-success)
 
 ## Scripts
 - `npm run build` - Compila o projeto Nest.js.
@@ -44,7 +53,7 @@ Este é um projeto de fórum online desenvolvido utilizando o framework Nest.js.
 Este projeto é distribuído sob a licença UNLICENSED. Consulte o arquivo `LICENSE` para obter mais informações sobre os termos de licenciamento.
 
 ## Autor
-[Samuel Alencar]
+Samuel Alencar
 
 --- 
 
