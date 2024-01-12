@@ -1,6 +1,5 @@
 module.exports = {
   env: {
-    // If you don't want to change this to `node: true` globally
     es2022: true,
   },
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
@@ -8,7 +7,9 @@ module.exports = {
   plugins: ['@typescript-eslint'],
   root: true,
   "rules": {
-    "@typescript-eslint/no-explicit-any": "error"
+    "@typescript-eslint/no-explicit-any": "error",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "error", 
   },
   overrides: [
     {
