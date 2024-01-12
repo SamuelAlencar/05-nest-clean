@@ -38,11 +38,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var app_module_1 = require("@/app.module");
 var prisma_service_1 = require("@/prisma/prisma.service");
+var jwt_1 = require("@nestjs/jwt");
 var testing_1 = require("@nestjs/testing");
 var supertest_1 = require("supertest");
-describe("Create Account (E2E)", function () {
+describe('Fetch recent questions (E2E)', function () {
     var app;
     var prisma;
+    var jwt;
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var moduleRef;
         return __generator(this, function (_a) {
@@ -54,6 +56,7 @@ describe("Create Account (E2E)", function () {
                     moduleRef = _a.sent();
                     app = moduleRef.createNestApplication();
                     prisma = moduleRef.get(prisma_service_1.PrismaService);
+                    jwt = moduleRef.get(jwt_1.JwtService);
                     return [4 /*yield*/, app.init()];
                 case 2:
                     _a.sent();
@@ -61,26 +64,51 @@ describe("Create Account (E2E)", function () {
             }
         });
     }); });
-    test("[POST] /accounts", function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response, userOnDatabase;
+    test('[GET] /questions', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var user, accessToken, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](app.getHttpServer()).post("/accounts").send({
-                        name: "John Doe",
-                        email: "johndoe@example.com",
-                        password: "123456"
+                case 0: return [4 /*yield*/, prisma.user.create({
+                        data: {
+                            name: 'John Doe',
+                            email: 'johndoe@example.com',
+                            password: '123456'
+                        }
                     })];
                 case 1:
-                    response = _a.sent();
-                    expect(response.statusCode).toBe(201);
-                    return [4 /*yield*/, prisma.user.findUnique({
-                            where: {
-                                email: "johndoe@example.com"
-                            }
+                    user = _a.sent();
+                    accessToken = jwt.sign({ sub: user.id });
+                    return [4 /*yield*/, prisma.question.createMany({
+                            data: [
+                                {
+                                    title: 'Question 01',
+                                    slug: 'question-01',
+                                    content: 'Question content',
+                                    authorId: user.id
+                                },
+                                {
+                                    title: 'Question 02',
+                                    slug: 'question-02',
+                                    content: 'Question content',
+                                    authorId: user.id
+                                },
+                            ]
                         })];
                 case 2:
-                    userOnDatabase = _a.sent();
-                    expect(userOnDatabase).toBeTruthy();
+                    _a.sent();
+                    return [4 /*yield*/, supertest_1["default"](app.getHttpServer())
+                            .get('/questions')
+                            .set('Authorization', "Bearer " + accessToken)
+                            .send()];
+                case 3:
+                    response = _a.sent();
+                    expect(response.statusCode).toBe(200);
+                    expect(response.body).toEqual({
+                        questions: [
+                            expect.objectContaining({ title: 'Question 01' }),
+                            expect.objectContaining({ title: 'Question 02' }),
+                        ]
+                    });
                     return [2 /*return*/];
             }
         });

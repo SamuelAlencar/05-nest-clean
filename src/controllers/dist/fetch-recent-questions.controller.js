@@ -66,7 +66,7 @@ var FetchRecentQuestionsController = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        perPage = 1;
+                        perPage = 20;
                         return [4 /*yield*/, this.prisma.question.findMany({
                                 take: perPage,
                                 skip: (page - 1) * perPage,
