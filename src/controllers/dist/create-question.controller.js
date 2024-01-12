@@ -5,6 +5,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -44,19 +47,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.CreateQuestionController = void 0;
 var common_1 = require("@nestjs/common");
+var current_user_decorator_1 = require("src/auth/current-user-decorator");
 var jwt_auth_guard_1 = require("src/auth/jwt-auth.guard");
 var CreateQuestionController = /** @class */ (function () {
     function CreateQuestionController() {
     }
-    CreateQuestionController.prototype.handle = function () {
+    CreateQuestionController.prototype.handle = function (user) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
+                console.log(user.sub);
                 return [2 /*return*/, 'ok'];
             });
         });
     };
     __decorate([
-        common_1.Post()
+        common_1.Post(),
+        __param(0, current_user_decorator_1.CurrentUser())
     ], CreateQuestionController.prototype, "handle");
     CreateQuestionController = __decorate([
         common_1.Controller('/questions'),

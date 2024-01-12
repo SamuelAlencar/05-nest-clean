@@ -60,7 +60,7 @@ var common_1 = require("@nestjs/common");
 var passport_1 = require("@nestjs/passport");
 var passport_jwt_1 = require("passport-jwt");
 var zod_1 = require("zod");
-var tokenSchema = zod_1.z.object({
+var tokenPayloadSchema = zod_1.z.object({
     sub: zod_1.z.string().uuid()
 });
 var JwtStrategy = /** @class */ (function (_super) {
@@ -78,7 +78,7 @@ var JwtStrategy = /** @class */ (function (_super) {
     JwtStrategy.prototype.validate = function (payload) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, tokenSchema.parse(payload)];
+                return [2 /*return*/, tokenPayloadSchema.parse(payload)];
             });
         });
     };
