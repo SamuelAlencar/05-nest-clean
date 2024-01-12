@@ -45,62 +45,50 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.CreateQuestionController = void 0;
+exports.FetchRecentQuestionsController = void 0;
 var common_1 = require("@nestjs/common");
-var current_user_decorator_1 = require("@/auth/current-user-decorator");
 var jwt_auth_guard_1 = require("@/auth/jwt-auth.guard");
 var zod_validation_pipe_1 = require("@/pipes/zod-validation-pipe");
 var zod_1 = require("zod");
-var createQuestionBodySchema = zod_1.z.object({
-    title: zod_1.z.string(),
-    content: zod_1.z.string()
-});
-var bodyValidationPipe = new zod_validation_pipe_1.ZodValidationPipe(createQuestionBodySchema);
-var CreateQuestionController = /** @class */ (function () {
-    function CreateQuestionController(prisma) {
+var pageQueryParamSchema = zod_1.z
+    .string()
+    .optional()["default"]('1')
+    .transform(Number)
+    .pipe(zod_1.z.number().min(1));
+var queryValidationPipe = new zod_validation_pipe_1.ZodValidationPipe(pageQueryParamSchema);
+var FetchRecentQuestionsController = /** @class */ (function () {
+    function FetchRecentQuestionsController(prisma) {
         this.prisma = prisma;
     }
-    CreateQuestionController.prototype.handle = function (body, user) {
+    FetchRecentQuestionsController.prototype.handle = function (page) {
         return __awaiter(this, void 0, void 0, function () {
-            var title, content, userId, slug;
+            var perPage, questions;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        title = body.title, content = body.content;
-                        userId = user.sub;
-                        slug = this.convertToSlug(title);
-                        return [4 /*yield*/, this.prisma.question.create({
-                                data: {
-                                    authorId: userId,
-                                    title: title,
-                                    content: content,
-                                    slug: slug
+                        perPage = 1;
+                        return [4 /*yield*/, this.prisma.question.findMany({
+                                take: perPage,
+                                skip: (page - 1) * perPage,
+                                orderBy: {
+                                    createAt: 'desc'
                                 }
                             })];
                     case 1:
-                        _a.sent();
-                        return [2 /*return*/];
+                        questions = _a.sent();
+                        return [2 /*return*/, { questions: questions }];
                 }
             });
         });
     };
-    CreateQuestionController.prototype.convertToSlug = function (title) {
-        return title
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^\w\s-]/g, "")
-            .replace(/\s+/g, "-");
-    };
     __decorate([
-        common_1.Post(),
-        __param(0, common_1.Body(bodyValidationPipe)),
-        __param(1, current_user_decorator_1.CurrentUser())
-    ], CreateQuestionController.prototype, "handle");
-    CreateQuestionController = __decorate([
-        common_1.Controller("/questions"),
+        common_1.Get(),
+        __param(0, common_1.Query('page', queryValidationPipe))
+    ], FetchRecentQuestionsController.prototype, "handle");
+    FetchRecentQuestionsController = __decorate([
+        common_1.Controller('/questions'),
         common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard)
-    ], CreateQuestionController);
-    return CreateQuestionController;
+    ], FetchRecentQuestionsController);
+    return FetchRecentQuestionsController;
 }());
-exports.CreateQuestionController = CreateQuestionController;
+exports.FetchRecentQuestionsController = FetchRecentQuestionsController;

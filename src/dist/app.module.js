@@ -10,11 +10,12 @@ exports.AppModule = void 0;
 var common_1 = require("@nestjs/common");
 var config_1 = require("@nestjs/config");
 var prisma_service_1 = require("./prisma/prisma.service");
-var create_account_controller_1 = require("./controllers/create-account.controller");
-var env_1 = require("./env");
+var env_1 = require("@/env");
 var auth_module_1 = require("./auth/auth.module");
+var create_account_controller_1 = require("./controllers/create-account.controller");
 var authenticate_controller_1 = require("./controllers/authenticate.controller");
 var create_question_controller_1 = require("./controllers/create-question.controller");
+var fetch_recent_questions_controller_1 = require("./controllers/fetch-recent-questions.controller");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -31,6 +32,7 @@ var AppModule = /** @class */ (function () {
                 create_account_controller_1.CreateAccountController,
                 authenticate_controller_1.AuthenticateController,
                 create_question_controller_1.CreateQuestionController,
+                fetch_recent_questions_controller_1.FetchRecentQuestionsController,
             ],
             providers: [prisma_service_1.PrismaService]
         })

@@ -48,7 +48,7 @@ exports.__esModule = true;
 exports.AuthenticateController = void 0;
 var common_1 = require("@nestjs/common");
 var bcryptjs_1 = require("bcryptjs");
-var zod_validation_pipe_1 = require("src/pipes/zod-validation-pipe");
+var zod_validation_pipe_1 = require("@/pipes/zod-validation-pipe");
 var zod_1 = require("zod");
 var authenticateBodySchema = zod_1.z.object({
     email: zod_1.z.string().email(),
