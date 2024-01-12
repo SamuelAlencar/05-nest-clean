@@ -39,8 +39,9 @@ exports.__esModule = true;
 var app_module_1 = require("@/app.module");
 var prisma_service_1 = require("@/prisma/prisma.service");
 var testing_1 = require("@nestjs/testing");
+var bcryptjs_1 = require("bcryptjs");
 var supertest_1 = require("supertest");
-describe('Create Account (E2E)', function () {
+describe('Authenticate (E2E)', function () {
     var app;
     var prisma;
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -61,26 +62,33 @@ describe('Create Account (E2E)', function () {
             }
         });
     }); });
-    test('[POST] /accounts', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response, userOnDatabase;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](app.getHttpServer()).post('/accounts').send({
+    test('[POST] /sessions', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var _a, _b, _c, _d, response;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
+                case 0:
+                    _b = (_a = prisma.user).create;
+                    _c = {};
+                    _d = {
                         name: 'John Doe',
-                        email: 'johndoe@example.com',
-                        password: '123456'
-                    })];
-                case 1:
-                    response = _a.sent();
-                    expect(response.statusCode).toBe(201);
-                    return [4 /*yield*/, prisma.user.findUnique({
-                            where: {
-                                email: 'johndoe@example.com'
-                            }
-                        })];
+                        email: 'johndoe@example.com'
+                    };
+                    return [4 /*yield*/, bcryptjs_1.hash('123456', 8)];
+                case 1: return [4 /*yield*/, _b.apply(_a, [(_c.data = (_d.password = _e.sent(),
+                            _d),
+                            _c)])];
                 case 2:
-                    userOnDatabase = _a.sent();
-                    expect(userOnDatabase).toBeTruthy();
+                    _e.sent();
+                    return [4 /*yield*/, supertest_1["default"](app.getHttpServer()).post('/sessions').send({
+                            email: 'johndoe@example.com',
+                            password: '123456'
+                        })];
+                case 3:
+                    response = _e.sent();
+                    expect(response.statusCode).toBe(201);
+                    expect(response.body).toEqual({
+                        access_token: expect.any(String)
+                    });
                     return [2 /*return*/];
             }
         });
