@@ -50,6 +50,7 @@ var common_1 = require("@nestjs/common");
 var jwt_auth_guard_1 = require("@/infra/auth/jwt-auth.guard");
 var zod_validation_pipe_1 = require("@/infra/http/pipes/zod-validation-pipe");
 var zod_1 = require("zod");
+var question_presenter_1 = require("@/infra/presenters/question-presenter");
 var pageQueryParamSchema = zod_1.z
     .string()
     .optional()["default"]('1')
@@ -62,15 +63,19 @@ var FetchRecentQuestionsController = /** @class */ (function () {
     }
     FetchRecentQuestionsController.prototype.handle = function (page) {
         return __awaiter(this, void 0, void 0, function () {
-            var questions;
+            var result, questions;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.fetchRecentQuestions.execute({
                             page: page
                         })];
                     case 1:
-                        questions = _a.sent();
-                        return [2 /*return*/, { questions: questions }];
+                        result = _a.sent();
+                        if (result.isLeft()) {
+                            throw new Error();
+                        }
+                        questions = result.value.questions;
+                        return [2 /*return*/, { questions: questions.map(question_presenter_1.QuestionPresenter.toHTTP) }];
                 }
             });
         });
