@@ -5,6 +5,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -42,32 +45,52 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.FetchRecentQuestionsUseCase = void 0;
-var either_1 = require("@/core/either");
+exports.CreateQuestionController = void 0;
 var common_1 = require("@nestjs/common");
-var FetchRecentQuestionsUseCase = /** @class */ (function () {
-    function FetchRecentQuestionsUseCase(questionsRepository) {
-        this.questionsRepository = questionsRepository;
+var current_user_decorator_1 = require("@/infra/auth/current-user-decorator");
+var zod_validation_pipe_1 = require("@/infra/http/pipes/zod-validation-pipe");
+var zod_1 = require("zod");
+var createQuestionBodySchema = zod_1.z.object({
+    title: zod_1.z.string(),
+    content: zod_1.z.string()
+});
+var bodyValidationPipe = new zod_validation_pipe_1.ZodValidationPipe(createQuestionBodySchema);
+var CreateQuestionController = /** @class */ (function () {
+    function CreateQuestionController(createQuestion) {
+        this.createQuestion = createQuestion;
     }
-    FetchRecentQuestionsUseCase.prototype.execute = function (_a) {
-        var page = _a.page;
-        return __awaiter(this, void 0, Promise, function () {
-            var questions;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, this.questionsRepository.findManyRecent({ page: page })];
-                    case 1:
-                        questions = _b.sent();
-                        return [2 /*return*/, either_1.right({
-                                questions: questions
+    CreateQuestionController.prototype.handle = function (body, user) {
+        return __awaiter(this, void 0, void 0, function () {
+            var title, content, userId, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        title = body.title, content = body.content;
+                        userId = user.sub;
+                        return [4 /*yield*/, this.createQuestion.execute({
+                                title: title,
+                                content: content,
+                                authorId: userId,
+                                attachmentsIds: []
                             })];
+                    case 1:
+                        result = _a.sent();
+                        if (result.isLeft()) {
+                            throw new common_1.BadRequestException();
+                        }
+                        return [2 /*return*/];
                 }
             });
         });
     };
-    FetchRecentQuestionsUseCase = __decorate([
-        common_1.Injectable()
-    ], FetchRecentQuestionsUseCase);
-    return FetchRecentQuestionsUseCase;
+    __decorate([
+        common_1.Post(),
+        __param(0, common_1.Body(bodyValidationPipe)),
+        __param(1, current_user_decorator_1.CurrentUser())
+    ], CreateQuestionController.prototype, "handle");
+    CreateQuestionController = __decorate([
+        common_1.Controller('/questions')
+    ], CreateQuestionController);
+    return CreateQuestionController;
 }());
-exports.FetchRecentQuestionsUseCase = FetchRecentQuestionsUseCase;
+exports.CreateQuestionController = CreateQuestionController;

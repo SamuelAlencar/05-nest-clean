@@ -1,4 +1,10 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,37 +42,53 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.DeleteQuestionCommentUseCase = void 0;
-var either_1 = require("@/core/either");
-var not_allowed_error_1 = require("@/core/errors/errors/not-allowed-error");
-var resource_not_found_error_1 = require("@/core/errors/errors/resource-not-found-error");
-var DeleteQuestionCommentUseCase = /** @class */ (function () {
-    function DeleteQuestionCommentUseCase(questionCommentsRepository) {
-        this.questionCommentsRepository = questionCommentsRepository;
+exports.PrismaStudentsRepository = void 0;
+var common_1 = require("@nestjs/common");
+var prisma_student_mapper_1 = require("../mappers/prisma-student-mapper");
+var PrismaStudentsRepository = /** @class */ (function () {
+    function PrismaStudentsRepository(prisma) {
+        this.prisma = prisma;
     }
-    DeleteQuestionCommentUseCase.prototype.execute = function (_a) {
-        var authorId = _a.authorId, questionCommentId = _a.questionCommentId;
+    PrismaStudentsRepository.prototype.findByEmail = function (email) {
         return __awaiter(this, void 0, Promise, function () {
-            var questionComment;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, this.questionCommentsRepository.findById(questionCommentId)];
+            var student;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.user.findUnique({
+                            where: {
+                                email: email
+                            }
+                        })];
                     case 1:
-                        questionComment = _b.sent();
-                        if (!questionComment) {
-                            return [2 /*return*/, either_1.left(new resource_not_found_error_1.ResourceNotFoundError())];
+                        student = _a.sent();
+                        if (!student) {
+                            return [2 /*return*/, null];
                         }
-                        if (questionComment.authorId.toString() !== authorId) {
-                            return [2 /*return*/, either_1.left(new not_allowed_error_1.NotAllowedError())];
-                        }
-                        return [4 /*yield*/, this.questionCommentsRepository["delete"](questionComment)];
-                    case 2:
-                        _b.sent();
-                        return [2 /*return*/, either_1.right(null)];
+                        return [2 /*return*/, prisma_student_mapper_1.PrismaStudentMapper.toDomain(student)];
                 }
             });
         });
     };
-    return DeleteQuestionCommentUseCase;
+    PrismaStudentsRepository.prototype.create = function (student) {
+        return __awaiter(this, void 0, Promise, function () {
+            var data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        data = prisma_student_mapper_1.PrismaStudentMapper.toPrisma(student);
+                        return [4 /*yield*/, this.prisma.user.create({
+                                data: data
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    PrismaStudentsRepository = __decorate([
+        common_1.Injectable()
+    ], PrismaStudentsRepository);
+    return PrismaStudentsRepository;
 }());
-exports.DeleteQuestionCommentUseCase = DeleteQuestionCommentUseCase;
+exports.PrismaStudentsRepository = PrismaStudentsRepository;

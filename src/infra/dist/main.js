@@ -38,19 +38,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var core_1 = require("@nestjs/core");
 var app_module_1 = require("./app.module");
-var config_1 = require("@nestjs/config");
+var env_service_1 = require("./env/env.service");
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function () {
         var app, configService, port;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, core_1.NestFactory.create(app_module_1.AppModule, {
-                    // logger: false
+                    // logger: false,
                     })];
                 case 1:
                     app = _a.sent();
-                    configService = app.get(config_1.ConfigService);
-                    port = configService.get('PORT', { infer: true });
+                    configService = app.get(env_service_1.EnvService);
+                    port = configService.get('PORT');
                     return [4 /*yield*/, app.listen(port)];
                 case 2:
                     _a.sent();
@@ -59,4 +59,4 @@ function bootstrap() {
         });
     });
 }
-void bootstrap();
+bootstrap();

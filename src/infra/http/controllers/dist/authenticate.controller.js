@@ -5,6 +5,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -42,49 +45,59 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.CreateQuestionUseCase = void 0;
-var question_1 = require("@/domain/forum/enterprise/entities/question");
-var unique_entity_id_1 = require("@/core/entities/unique-entity-id");
-var either_1 = require("@/core/either");
-var question_attachment_1 = require("@/domain/forum/enterprise/entities/question-attachment");
-var question_attachment_list_1 = require("@/domain/forum/enterprise/entities/question-attachment-list");
+exports.AuthenticateController = void 0;
 var common_1 = require("@nestjs/common");
-var CreateQuestionUseCase = /** @class */ (function () {
-    function CreateQuestionUseCase(questionsRepository) {
-        this.questionsRepository = questionsRepository;
+var zod_validation_pipe_1 = require("@/infra/http/pipes/zod-validation-pipe");
+var zod_1 = require("zod");
+var wrong_credentials_error_1 = require("@/domain/forum/application/use-cases/errors/wrong-credentials-error");
+var public_1 = require("@/infra/auth/public");
+var authenticateBodySchema = zod_1.z.object({
+    email: zod_1.z.string().email(),
+    password: zod_1.z.string()
+});
+var AuthenticateController = /** @class */ (function () {
+    function AuthenticateController(authenticateStudent) {
+        this.authenticateStudent = authenticateStudent;
     }
-    CreateQuestionUseCase.prototype.execute = function (_a) {
-        var authorId = _a.authorId, title = _a.title, content = _a.content, attachmentsIds = _a.attachmentsIds;
-        return __awaiter(this, void 0, Promise, function () {
-            var question, questionAttachments;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+    AuthenticateController.prototype.handle = function (body) {
+        return __awaiter(this, void 0, void 0, function () {
+            var email, password, result, error, accessToken;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        question = question_1.Question.create({
-                            authorId: new unique_entity_id_1.UniqueEntityID(authorId),
-                            title: title,
-                            content: content
-                        });
-                        questionAttachments = attachmentsIds.map(function (attachmentId) {
-                            return question_attachment_1.QuestionAttachment.create({
-                                attachmentId: new unique_entity_id_1.UniqueEntityID(attachmentId),
-                                questionId: question.id
-                            });
-                        });
-                        question.attachments = new question_attachment_list_1.QuestionAttachmentList(questionAttachments);
-                        return [4 /*yield*/, this.questionsRepository.create(question)];
-                    case 1:
-                        _b.sent();
-                        return [2 /*return*/, either_1.right({
-                                question: question
+                        email = body.email, password = body.password;
+                        return [4 /*yield*/, this.authenticateStudent.execute({
+                                email: email,
+                                password: password
                             })];
+                    case 1:
+                        result = _a.sent();
+                        if (result.isLeft()) {
+                            error = result.value;
+                            switch (error.constructor) {
+                                case wrong_credentials_error_1.WrongCredentialsError:
+                                    throw new common_1.UnauthorizedException(error.message);
+                                default:
+                                    throw new common_1.BadRequestException(error.message);
+                            }
+                        }
+                        accessToken = result.value.accessToken;
+                        return [2 /*return*/, {
+                                access_token: accessToken
+                            }];
                 }
             });
         });
     };
-    CreateQuestionUseCase = __decorate([
-        common_1.Injectable()
-    ], CreateQuestionUseCase);
-    return CreateQuestionUseCase;
+    __decorate([
+        common_1.Post(),
+        common_1.UsePipes(new zod_validation_pipe_1.ZodValidationPipe(authenticateBodySchema)),
+        __param(0, common_1.Body())
+    ], AuthenticateController.prototype, "handle");
+    AuthenticateController = __decorate([
+        common_1.Controller('/sessions'),
+        public_1.Public()
+    ], AuthenticateController);
+    return AuthenticateController;
 }());
-exports.CreateQuestionUseCase = CreateQuestionUseCase;
+exports.AuthenticateController = AuthenticateController;

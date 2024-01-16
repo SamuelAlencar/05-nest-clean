@@ -45,47 +45,59 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.FetchRecentQuestionsController = void 0;
+exports.CreateAccountController = void 0;
 var common_1 = require("@nestjs/common");
-var zod_validation_pipe_1 = require("@/infra/http/pipes/zod-validation-pipe");
 var zod_1 = require("zod");
-var question_presenter_1 = require("@/infra/http/presenters/question-presenter");
-var pageQueryParamSchema = zod_1.z
-    .string()
-    .optional()["default"]('1')
-    .transform(Number)
-    .pipe(zod_1.z.number().min(1));
-var queryValidationPipe = new zod_validation_pipe_1.ZodValidationPipe(pageQueryParamSchema);
-var FetchRecentQuestionsController = /** @class */ (function () {
-    function FetchRecentQuestionsController(fetchRecentQuestions) {
-        this.fetchRecentQuestions = fetchRecentQuestions;
+var zod_validation_pipe_1 = require("@/infra/http/pipes/zod-validation-pipe");
+var student_already_exists_error_1 = require("@/domain/forum/application/use-cases/errors/student-already-exists-error");
+var public_1 = require("@/infra/auth/public");
+var createAccountBodySchema = zod_1.z.object({
+    name: zod_1.z.string(),
+    email: zod_1.z.string().email(),
+    password: zod_1.z.string()
+});
+var CreateAccountController = /** @class */ (function () {
+    function CreateAccountController(registerStudent) {
+        this.registerStudent = registerStudent;
     }
-    FetchRecentQuestionsController.prototype.handle = function (page) {
+    CreateAccountController.prototype.handle = function (body) {
         return __awaiter(this, void 0, void 0, function () {
-            var result, questions;
+            var name, email, password, result, error;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.fetchRecentQuestions.execute({
-                            page: page
-                        })];
+                    case 0:
+                        name = body.name, email = body.email, password = body.password;
+                        return [4 /*yield*/, this.registerStudent.execute({
+                                name: name,
+                                email: email,
+                                password: password
+                            })];
                     case 1:
                         result = _a.sent();
                         if (result.isLeft()) {
-                            throw new common_1.BadRequestException();
+                            error = result.value;
+                            switch (error.constructor) {
+                                case student_already_exists_error_1.StudentAlreadyExistsError:
+                                    throw new common_1.ConflictException(error.message);
+                                default:
+                                    throw new common_1.BadRequestException(error.message);
+                            }
                         }
-                        questions = result.value.questions;
-                        return [2 /*return*/, { questions: questions.map(question_presenter_1.QuestionPresenter.toHTTP) }];
+                        return [2 /*return*/];
                 }
             });
         });
     };
     __decorate([
-        common_1.Get(),
-        __param(0, common_1.Query('page', queryValidationPipe))
-    ], FetchRecentQuestionsController.prototype, "handle");
-    FetchRecentQuestionsController = __decorate([
-        common_1.Controller('/questions')
-    ], FetchRecentQuestionsController);
-    return FetchRecentQuestionsController;
+        common_1.Post(),
+        common_1.HttpCode(201),
+        common_1.UsePipes(new zod_validation_pipe_1.ZodValidationPipe(createAccountBodySchema)),
+        __param(0, common_1.Body())
+    ], CreateAccountController.prototype, "handle");
+    CreateAccountController = __decorate([
+        common_1.Controller('/accounts'),
+        public_1.Public()
+    ], CreateAccountController);
+    return CreateAccountController;
 }());
-exports.FetchRecentQuestionsController = FetchRecentQuestionsController;
+exports.CreateAccountController = CreateAccountController;

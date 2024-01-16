@@ -6,27 +6,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.AppModule = void 0;
+exports.EnvModule = void 0;
 var common_1 = require("@nestjs/common");
-var config_1 = require("@nestjs/config");
-var env_1 = require("@/infra/env/env");
-var auth_module_1 = require("./auth/auth.module");
-var http_module_1 = require("./http/http.module");
-var AppModule = /** @class */ (function () {
-    function AppModule() {
+var env_service_1 = require("./env.service");
+var EnvModule = /** @class */ (function () {
+    function EnvModule() {
     }
-    AppModule = __decorate([
+    EnvModule = __decorate([
         common_1.Module({
-            imports: [
-                config_1.ConfigModule.forRoot({
-                    validate: function (env) { return env_1.envSchema.parse(env); },
-                    isGlobal: true
-                }),
-                auth_module_1.AuthModule,
-                http_module_1.HttpModule,
-            ]
+            providers: [env_service_1.EnvService],
+            exports: [env_service_1.EnvService]
         })
-    ], AppModule);
-    return AppModule;
+    ], EnvModule);
+    return EnvModule;
 }());
-exports.AppModule = AppModule;
+exports.EnvModule = EnvModule;

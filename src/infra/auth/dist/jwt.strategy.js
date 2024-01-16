@@ -67,7 +67,7 @@ var JwtStrategy = /** @class */ (function (_super) {
     __extends(JwtStrategy, _super);
     function JwtStrategy(config) {
         var _this = this;
-        var publicKey = config.get('JWT_PUBLIC_KEY', { infer: true });
+        var publicKey = config.get('JWT_PUBLIC_KEY');
         _this = _super.call(this, {
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: Buffer.from(publicKey, 'base64'),
