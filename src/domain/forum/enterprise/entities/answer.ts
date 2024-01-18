@@ -10,7 +10,7 @@ export interface AnswerProps {
   content: string
   attachments: AnswerAttachmentList
   createdAt: Date
-  updatedAt?: Date
+  updatedAt?: Date | null
 }
 
 export class Answer extends AggregateRoot<AnswerProps> {
@@ -25,7 +25,7 @@ export class Answer extends AggregateRoot<AnswerProps> {
   get content() {
     return this.props.content
   }
-  
+
   set content(content: string) {
     this.props.content = content
     this.touch()
@@ -38,7 +38,7 @@ export class Answer extends AggregateRoot<AnswerProps> {
   set attachments(attachments: AnswerAttachmentList) {
     this.props.attachments = attachments
     this.touch()
-  }  
+  }
 
   get createdAt() {
     return this.props.createdAt
@@ -55,7 +55,6 @@ export class Answer extends AggregateRoot<AnswerProps> {
   private touch() {
     this.props.updatedAt = new Date()
   }
-
 
   static create(
     props: Optional<AnswerProps, 'createdAt' | 'attachments'>,
