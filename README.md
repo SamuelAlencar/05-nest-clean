@@ -8,9 +8,9 @@ Este é um projeto de fórum online desenvolvido utilizando o framework Nest.js.
 
 ## Tecnologias Utilizadas
 - [Nest.js](https://nestjs.com/) - Framework para construção de aplicativos server-side em Node.js.
-  ![Nest.js](https://img.shields.io/badge/Nest.js-%E2%9C%94-green)
+  ![Nest.js](https://img.s  ![Prisma](https://img.shields.io/badge/Prisma-%E2%9C%94-blue)
+hields.io/badge/Nest.js-%E2%9C%94-green)
 - [Prisma](https://www.prisma.io/) - ORM (Object-Relational Mapping) para Node.js e TypeScript.
-  ![Prisma](https://img.shields.io/badge/Prisma-%E2%9C%94-blue)
 - [AWS SDK](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/index.html) - Biblioteca para interagir com serviços da AWS, utilizado aqui para integração com o Amazon S3.
   ![AWS SDK](https://img.shields.io/badge/AWS%20SDK-%E2%9C%94-orange)
 - [bcryptjs](https://github.com/dcodeIO/bcrypt.js) - Biblioteca para hashing de senhas.

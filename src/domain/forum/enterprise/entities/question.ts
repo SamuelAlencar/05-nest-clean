@@ -18,6 +18,9 @@ export interface QuestionProps {
 }
 
 export class Question extends AggregateRoot<QuestionProps> {
+  static toHTTP(value: any) {
+      throw new Error('Method not implemented.')
+  }
   get authorId() {
     return this.props.authorId
   }
