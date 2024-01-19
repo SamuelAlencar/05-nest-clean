@@ -36,33 +36,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var slug_1 = require("@/domain/forum/enterprise/entities/value-objects/slug");
 var app_module_1 = require("@/infra/app.module");
 var database_module_1 = require("@/infra/database/database.module");
-var jwt_1 = require("@nestjs/jwt");
 var testing_1 = require("@nestjs/testing");
+var bcryptjs_1 = require("bcryptjs");
 var supertest_1 = require("supertest");
-var make_question_1 = require("test/factories/make-question");
 var make_student_1 = require("test/factories/make-student");
-describe('Get question by slug (E2E)', function () {
+describe('Authenticate (E2E)', function () {
     var app;
     var studentFactory;
-    var questionFactory;
-    var jwt;
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var moduleRef;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, testing_1.Test.createTestingModule({
                         imports: [app_module_1.AppModule, database_module_1.DatabaseModule],
-                        providers: [make_student_1.StudentFactory, make_question_1.QuestionFactory]
+                        providers: [make_student_1.StudentFactory]
                     }).compile()];
                 case 1:
                     moduleRef = _a.sent();
                     app = moduleRef.createNestApplication();
                     studentFactory = moduleRef.get(make_student_1.StudentFactory);
-                    questionFactory = moduleRef.get(make_question_1.QuestionFactory);
-                    jwt = moduleRef.get(jwt_1.JwtService);
                     return [4 /*yield*/, app.init()];
                 case 2:
                     _a.sent();
@@ -70,30 +64,29 @@ describe('Get question by slug (E2E)', function () {
             }
         });
     }); });
-    test('[GET] /questions/:slug', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var user, accessToken, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, studentFactory.makePrismaStudent()];
-                case 1:
-                    user = _a.sent();
-                    accessToken = jwt.sign({ sub: user.id.toString() });
-                    return [4 /*yield*/, questionFactory.makePrismaQuestion({
-                            authorId: user.id,
-                            title: 'Question 01',
-                            slug: slug_1.Slug.create('question-01')
-                        })];
+    test('[POST] /sessions', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var _a, _b, _c, response;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
+                    _b = (_a = studentFactory).makePrismaStudent;
+                    _c = {
+                        email: 'johndoe@example.com'
+                    };
+                    return [4 /*yield*/, bcryptjs_1.hash('123456', 8)];
+                case 1: return [4 /*yield*/, _b.apply(_a, [(_c.password = _d.sent(),
+                            _c)])];
                 case 2:
-                    _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](app.getHttpServer())
-                            .get('/questions/question-01')
-                            .set('Authorization', "Bearer " + accessToken)
-                            .send()];
+                    _d.sent();
+                    return [4 /*yield*/, supertest_1["default"](app.getHttpServer()).post('/sessions').send({
+                            email: 'johndoe@example.com',
+                            password: '123456'
+                        })];
                 case 3:
-                    response = _a.sent();
-                    expect(response.statusCode).toBe(200);
+                    response = _d.sent();
+                    expect(response.statusCode).toBe(201);
                     expect(response.body).toEqual({
-                        question: expect.objectContaining({ title: 'Question 01' })
+                        access_token: expect.any(String)
                     });
                     return [2 /*return*/];
             }

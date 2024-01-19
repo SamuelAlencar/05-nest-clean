@@ -36,7 +36,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var slug_1 = require("@/domain/forum/enterprise/entities/value-objects/slug");
 var app_module_1 = require("@/infra/app.module");
 var database_module_1 = require("@/infra/database/database.module");
 var jwt_1 = require("@nestjs/jwt");
@@ -44,7 +43,7 @@ var testing_1 = require("@nestjs/testing");
 var supertest_1 = require("supertest");
 var make_question_1 = require("test/factories/make-question");
 var make_student_1 = require("test/factories/make-student");
-describe('Get question by slug (E2E)', function () {
+describe('Fetch recent questions (E2E)', function () {
     var app;
     var studentFactory;
     var questionFactory;
@@ -70,7 +69,7 @@ describe('Get question by slug (E2E)', function () {
             }
         });
     }); });
-    test('[GET] /questions/:slug', function () { return __awaiter(void 0, void 0, void 0, function () {
+    test('[GET] /questions', function () { return __awaiter(void 0, void 0, void 0, function () {
         var user, accessToken, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -78,22 +77,25 @@ describe('Get question by slug (E2E)', function () {
                 case 1:
                     user = _a.sent();
                     accessToken = jwt.sign({ sub: user.id.toString() });
-                    return [4 /*yield*/, questionFactory.makePrismaQuestion({
-                            authorId: user.id,
-                            title: 'Question 01',
-                            slug: slug_1.Slug.create('question-01')
-                        })];
+                    return [4 /*yield*/, Promise.all([
+                            questionFactory.makePrismaQuestion({
+                                authorId: user.id,
+                                title: 'Question 01'
+                            }),
+                        ])];
                 case 2:
                     _a.sent();
                     return [4 /*yield*/, supertest_1["default"](app.getHttpServer())
-                            .get('/questions/question-01')
+                            .get('/questions')
                             .set('Authorization', "Bearer " + accessToken)
                             .send()];
                 case 3:
                     response = _a.sent();
                     expect(response.statusCode).toBe(200);
                     expect(response.body).toEqual({
-                        question: expect.objectContaining({ title: 'Question 01' })
+                        questions: [
+                            expect.objectContaining({ title: 'Question 01' }),
+                        ]
                     });
                     return [2 /*return*/];
             }
