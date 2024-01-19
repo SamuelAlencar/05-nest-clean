@@ -1,35 +1,21 @@
-import { Question } from '@/domain/forum/enterprise/entities/question'
-import { Either, left, right } from '@/core/either'
-import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
-import { Injectable } from '@nestjs/common'
-import { QuestionsRepository } from '@/domain/forum/application/repositories/questions-repository'
+import { BadRequestException, Controller, Get, Param } from '@nestjs/common'
+import { GetQuestionBySlugUseCase } from '@/domain/forum/application/use-cases/get-question-by-slug'
+import { QuestionPresenter } from '../presenters/question-presenter'
 
-interface GetQuestionBySlugUseCaseRequest {
-  slug: string
-}
+@Controller('/questions/:slug')
+export class GetQuestionBySlugController {
+  constructor(private getQuestionBySlug: GetQuestionBySlugUseCase) {}
 
-type GetQuestionBySlugUseCaseResponse = Either<
-  ResourceNotFoundError,
-  {
-    question: Question
-  }
->
+  @Get()
+  async handle(@Param('slug') slug: string) {
+    const result = await this.getQuestionBySlug.execute({
+      slug,
+    })
 
-@Injectable()
-export class GetQuestionBySlugUseCase {
-  constructor(private questionsRepository: QuestionsRepository) {}
-
-  async execute({
-    slug,
-  }: GetQuestionBySlugUseCaseRequest): Promise<GetQuestionBySlugUseCaseResponse> {
-    const question = await this.questionsRepository.findBySlug(slug)
-
-    if (!question) {
-      return left(new ResourceNotFoundError())
+    if (result.isLeft()) {
+      throw new BadRequestException()
     }
 
-    return right({
-      question,
-    })
+    return { question: QuestionPresenter.toHTTP(result.value.question) }
   }
 }
