@@ -47,12 +47,14 @@ var fetch_question_comments_controller_1 = require("./controllers/fetch-question
 var fetch_answer_comments_controller_1 = require("./controllers/fetch-answer-comments.controller");
 var fetch_answer_comments_1 = require("@/domain/forum/application/use-cases/fetch-answer-comments");
 var upload_attachment_controller_1 = require("./controllers/upload-attachment.controller");
+var storage_module_1 = require("../storage/storage.module");
+var upload_and_create_attachment_1 = require("@/domain/forum/application/use-cases/upload-and-create-attachment");
 var HttpModule = /** @class */ (function () {
     function HttpModule() {
     }
     HttpModule = __decorate([
         common_1.Module({
-            imports: [database_module_1.DatabaseModule, cryptography_module_1.CryptographyModule],
+            imports: [database_module_1.DatabaseModule, cryptography_module_1.CryptographyModule, storage_module_1.StorageModule],
             controllers: [
                 create_account_controller_1.CreateAccountController,
                 authenticate_controller_1.AuthenticateController,
@@ -93,6 +95,7 @@ var HttpModule = /** @class */ (function () {
                 delete_answer_comment_1.DeleteAnswerCommentUseCase,
                 fetch_question_comments_1.FetchQuestionCommentsUseCase,
                 fetch_answer_comments_1.FetchAnswerCommentsUseCase,
+                upload_and_create_attachment_1.UploadAndCreateAttachmentUseCase,
             ]
         })
     ], HttpModule);
