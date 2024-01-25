@@ -46,17 +46,39 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.UploadAttachmentController = void 0;
+var invalid_attachment_type_error_1 = require("@/domain/forum/application/use-cases/errors/invalid-attachment-type-error");
 var common_1 = require("@nestjs/common");
 var platform_express_1 = require("@nestjs/platform-express");
 var UploadAttachmentController = /** @class */ (function () {
-    function UploadAttachmentController() {
+    function UploadAttachmentController(uploadAndCreateAttachment) {
+        this.uploadAndCreateAttachment = uploadAndCreateAttachment;
     }
-    // constructor() {}
     UploadAttachmentController.prototype.handle = function (file) {
         return __awaiter(this, void 0, void 0, function () {
+            var result, error, attachment;
             return __generator(this, function (_a) {
-                console.log(file);
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.uploadAndCreateAttachment.execute({
+                            fileName: file.originalname,
+                            fileType: file.mimetype,
+                            body: file.buffer
+                        })];
+                    case 1:
+                        result = _a.sent();
+                        if (result.isLeft()) {
+                            error = result.value;
+                            switch (error.constructor) {
+                                case invalid_attachment_type_error_1.InvalidAttachmentTypeError:
+                                    throw new common_1.BadRequestException(error.message);
+                                default:
+                                    throw new common_1.BadRequestException(error.message);
+                            }
+                        }
+                        attachment = result.value.attachment;
+                        return [2 /*return*/, {
+                                attachmentId: attachment.id.toString()
+                            }];
+                }
             });
         });
     };

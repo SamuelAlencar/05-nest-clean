@@ -46,8 +46,9 @@ exports.PrismaAnswersRepository = void 0;
 var common_1 = require("@nestjs/common");
 var prisma_answer_mapper_1 = require("../mappers/prisma-answer-mapper");
 var PrismaAnswersRepository = /** @class */ (function () {
-    function PrismaAnswersRepository(prisma) {
+    function PrismaAnswersRepository(prisma, answerAttachmentsRepository) {
         this.prisma = prisma;
+        this.answerAttachmentsRepository = answerAttachmentsRepository;
     }
     PrismaAnswersRepository.prototype.findById = function (id) {
         return __awaiter(this, void 0, Promise, function () {
@@ -104,6 +105,9 @@ var PrismaAnswersRepository = /** @class */ (function () {
                             })];
                     case 1:
                         _a.sent();
+                        return [4 /*yield*/, this.answerAttachmentsRepository.createMany(answer.attachments.getItems())];
+                    case 2:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -116,12 +120,16 @@ var PrismaAnswersRepository = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         data = prisma_answer_mapper_1.PrismaAnswerMapper.toPrisma(answer);
-                        return [4 /*yield*/, this.prisma.answer.update({
-                                where: {
-                                    id: answer.id.toString()
-                                },
-                                data: data
-                            })];
+                        return [4 /*yield*/, Promise.all([
+                                this.prisma.answer.update({
+                                    where: {
+                                        id: answer.id.toString()
+                                    },
+                                    data: data
+                                }),
+                                this.answerAttachmentsRepository.createMany(answer.attachments.getNewItems()),
+                                this.answerAttachmentsRepository.deleteMany(answer.attachments.getRemovedItems()),
+                            ])];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];

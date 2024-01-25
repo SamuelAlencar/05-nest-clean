@@ -22,7 +22,7 @@ export abstract class Comment<
   set content(content: string) {
     this.props.content = content
     this.touch()
-  }  
+  }
 
   get createdAt() {
     return this.props.createdAt
@@ -35,5 +35,4 @@ export abstract class Comment<
   private touch() {
     this.props.updatedAt = new Date()
   }
-
 }

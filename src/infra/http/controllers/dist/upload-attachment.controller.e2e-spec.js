@@ -82,6 +82,9 @@ describe('Upload attachment (E2E)', function () {
                 case 2:
                     response = _a.sent();
                     expect(response.statusCode).toBe(201);
+                    expect(response.body).toEqual({
+                        attachmentId: expect.any(String)
+                    });
                     return [2 /*return*/];
             }
         });

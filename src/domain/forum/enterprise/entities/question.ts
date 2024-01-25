@@ -18,9 +18,6 @@ export interface QuestionProps {
 }
 
 export class Question extends AggregateRoot<QuestionProps> {
-  static toHTTP(value: any) {
-      throw new Error('Method not implemented.')
-  }
   get authorId() {
     return this.props.authorId
   }
@@ -30,7 +27,15 @@ export class Question extends AggregateRoot<QuestionProps> {
   }
 
   set bestAnswerId(bestAnswerId: UniqueEntityID | undefined | null) {
-    if (bestAnswerId && bestAnswerId !== this.props.bestAnswerId) {
+    if (bestAnswerId === undefined || bestAnswerId === null) {
+      return
+    }
+
+    if (
+      this.props.bestAnswerId === undefined ||
+      this.props.bestAnswerId === null ||
+      !bestAnswerId.equals(this.props.bestAnswerId)
+    ) {
       this.addDomainEvent(new QuestionBestAnswerChosenEvent(this, bestAnswerId))
     }
 
