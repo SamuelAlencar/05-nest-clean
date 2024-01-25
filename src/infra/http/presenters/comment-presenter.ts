@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Comment } from '@/domain/forum/enterprise/entities/comment'
 
 export class CommentPresenter {

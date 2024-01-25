@@ -63,7 +63,6 @@ describe('Create question (E2E)', () => {
         questionId: questionOnDatabase?.id,
       },
     })
-    console.log(await prisma.attachment)
 
     expect(attachmentsOnDatabase).toHaveLength(2)
   })
