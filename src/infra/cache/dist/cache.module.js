@@ -9,14 +9,23 @@ exports.__esModule = true;
 exports.CacheModule = void 0;
 var common_1 = require("@nestjs/common");
 var env_module_1 = require("../env/env.module");
-var env_service_1 = require("../env/env.service");
+var cache_repository_1 = require("./cache-repository");
+var redis_cache_repository_1 = require("./redis/redis-cache-repository");
+var redis_service_1 = require("./redis/redis.service");
 var CacheModule = /** @class */ (function () {
     function CacheModule() {
     }
     CacheModule = __decorate([
         common_1.Module({
             imports: [env_module_1.EnvModule],
-            providers: [env_service_1.EnvService]
+            providers: [
+                redis_service_1.RedisService,
+                {
+                    provide: cache_repository_1.CacheRepository,
+                    useClass: redis_cache_repository_1.RedisCacheRepository
+                },
+            ],
+            exports: [cache_repository_1.CacheRepository]
         })
     ], CacheModule);
     return CacheModule;

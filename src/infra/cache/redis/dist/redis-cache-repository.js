@@ -1,4 +1,10 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,57 +42,42 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var dotenv_1 = require("dotenv");
-var client_1 = require("@prisma/client");
-var node_crypto_1 = require("node:crypto");
-var node_child_process_1 = require("node:child_process");
-var domain_events_1 = require("@/core/events/domain-events");
-var ioredis_1 = require("ioredis");
-var env_1 = require("@/infra/env/env");
-dotenv_1.config({ path: '.env', override: true });
-dotenv_1.config({ path: '.env.test', override: true });
-var env = env_1.envSchema.parse(process.env);
-var prisma = new client_1.PrismaClient();
-var redis = new ioredis_1.Redis({
-    host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
-    db: env.REDIS_DB
-});
-function generateUniqueDatabaseURL(schemaId) {
-    if (!env.DATABASE_URL) {
-        throw new Error('Please provider a DATABASE_URL environment variable');
+exports.RedisCacheRepository = void 0;
+var common_1 = require("@nestjs/common");
+var RedisCacheRepository = /** @class */ (function () {
+    function RedisCacheRepository(redis) {
+        this.redis = redis;
     }
-    var url = new URL(env.DATABASE_URL);
-    url.searchParams.set('schema', schemaId);
-    return url.toString();
-}
-var schemaId = node_crypto_1.randomUUID();
-beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var databaseURL;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                databaseURL = generateUniqueDatabaseURL(schemaId);
-                process.env.DATABASE_URL = databaseURL;
-                domain_events_1.DomainEvents.shouldRun = false;
-                return [4 /*yield*/, redis.flushdb()];
-            case 1:
-                _a.sent();
-                node_child_process_1.execSync('pnpm prisma migrate deploy');
-                return [2 /*return*/];
-        }
-    });
-}); });
-afterAll(function () { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, prisma.$executeRawUnsafe("DROP SCHEMA IF EXISTS \"" + schemaId + "\" CASCADE")];
-            case 1:
-                _a.sent();
-                return [4 /*yield*/, prisma.$disconnect()];
-            case 2:
-                _a.sent();
-                return [2 /*return*/];
-        }
-    });
-}); });
+    RedisCacheRepository.prototype.set = function (key, value) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.redis.set(key, value, 'EX', 60 * 15)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    RedisCacheRepository.prototype.get = function (key) {
+        return this.redis.get(key);
+    };
+    RedisCacheRepository.prototype["delete"] = function (key) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.redis.del(key)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    RedisCacheRepository = __decorate([
+        common_1.Injectable()
+    ], RedisCacheRepository);
+    return RedisCacheRepository;
+}());
+exports.RedisCacheRepository = RedisCacheRepository;
