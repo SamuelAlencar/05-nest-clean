@@ -43,14 +43,16 @@ var prisma_service_1 = require("@/infra/database/prisma/prisma.service");
 var jwt_1 = require("@nestjs/jwt");
 var testing_1 = require("@nestjs/testing");
 var supertest_1 = require("supertest");
+var make_answer_1 = require("test/factories/make-answer");
 var make_question_1 = require("test/factories/make-question");
 var make_student_1 = require("test/factories/make-student");
 var wait_for_1 = require("test/utils/wait-for");
-describe('On answer created (E2E)', function () {
+describe('On question best answer chosen (E2E)', function () {
     var app;
     var prisma;
     var studentFactory;
     var questionFactory;
+    var answerFactory;
     var jwt;
     beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
         var moduleRef;
@@ -58,7 +60,7 @@ describe('On answer created (E2E)', function () {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, testing_1.Test.createTestingModule({
                         imports: [app_module_1.AppModule, database_module_1.DatabaseModule],
-                        providers: [make_student_1.StudentFactory, make_question_1.QuestionFactory]
+                        providers: [make_student_1.StudentFactory, make_question_1.QuestionFactory, make_answer_1.AnswerFactory]
                     }).compile()];
                 case 1:
                     moduleRef = _a.sent();
@@ -66,6 +68,7 @@ describe('On answer created (E2E)', function () {
                     prisma = moduleRef.get(prisma_service_1.PrismaService);
                     studentFactory = moduleRef.get(make_student_1.StudentFactory);
                     questionFactory = moduleRef.get(make_question_1.QuestionFactory);
+                    answerFactory = moduleRef.get(make_answer_1.AnswerFactory);
                     jwt = moduleRef.get(jwt_1.JwtService);
                     domain_events_1.DomainEvents.shouldRun = true;
                     return [4 /*yield*/, app.init()];
@@ -75,8 +78,8 @@ describe('On answer created (E2E)', function () {
             }
         });
     }); });
-    it('should send a notification when answer is created', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var user, accessToken, question, questionId;
+    it('should send a notification when question best answer is chosen', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var user, accessToken, question, answer, answerId;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, studentFactory.makePrismaStudent()];
@@ -88,15 +91,18 @@ describe('On answer created (E2E)', function () {
                         })];
                 case 2:
                     question = _a.sent();
-                    questionId = question.id.toString();
-                    return [4 /*yield*/, supertest_1["default"](app.getHttpServer())
-                            .post("/questions/" + questionId + "/answers")
-                            .set('Authorization', "Bearer " + accessToken)
-                            .send({
-                            content: 'New answer',
-                            attachments: []
+                    return [4 /*yield*/, answerFactory.makePrismaAnswer({
+                            questionId: question.id,
+                            authorId: user.id
                         })];
                 case 3:
+                    answer = _a.sent();
+                    answerId = answer.id.toString();
+                    return [4 /*yield*/, supertest_1["default"](app.getHttpServer())
+                            .patch("/answers/" + answerId + "/choose-as-best")
+                            .set('Authorization', "Bearer " + accessToken)
+                            .send()];
+                case 4:
                     _a.sent();
                     return [4 /*yield*/, wait_for_1.waitFor(function () { return __awaiter(void 0, void 0, void 0, function () {
                             var notificationOnDatabase;
@@ -114,7 +120,7 @@ describe('On answer created (E2E)', function () {
                                 }
                             });
                         }); })];
-                case 4:
+                case 5:
                     _a.sent();
                     return [2 /*return*/];
             }
