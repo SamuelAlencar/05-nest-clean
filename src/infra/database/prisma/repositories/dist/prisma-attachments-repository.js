@@ -42,47 +42,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.OnQuestionBestAnswerChosen = void 0;
-var domain_events_1 = require("@/core/events/domain-events");
-var question_best_answer_chosen_event_1 = require("@/domain/forum/enterprise/events/question-best-answer-chosen-event");
+exports.PrismaAttachmentsRepository = void 0;
 var common_1 = require("@nestjs/common");
-var OnQuestionBestAnswerChosen = /** @class */ (function () {
-    function OnQuestionBestAnswerChosen(answersRepository, sendNotification) {
-        this.answersRepository = answersRepository;
-        this.sendNotification = sendNotification;
-        this.setupSubscriptions();
+var prisma_attachment_mapper_1 = require("../mappers/prisma-attachment-mapper");
+var PrismaAttachmentsRepository = /** @class */ (function () {
+    function PrismaAttachmentsRepository(prisma) {
+        this.prisma = prisma;
     }
-    OnQuestionBestAnswerChosen.prototype.setupSubscriptions = function () {
-        domain_events_1.DomainEvents.register(this.sendQuestionBestAnswerNotification.bind(this), question_best_answer_chosen_event_1.QuestionBestAnswerChosenEvent.name);
-    };
-    OnQuestionBestAnswerChosen.prototype.sendQuestionBestAnswerNotification = function (_a) {
-        var question = _a.question, bestAnswerId = _a.bestAnswerId;
-        return __awaiter(this, void 0, void 0, function () {
-            var answer;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, this.answersRepository.findById(bestAnswerId.toString())];
-                    case 1:
-                        answer = _b.sent();
-                        if (!answer) return [3 /*break*/, 3];
-                        return [4 /*yield*/, this.sendNotification.execute({
-                                recipientId: answer.authorId.toString(),
-                                title: "Sua resposta foi escolhida!",
-                                content: "A resposta que voc\u00EA enviou em \"" + question.title
-                                    .substring(0, 20)
-                                    .concat('...') + "\" foi escolhida pelo autor!\""
+    PrismaAttachmentsRepository.prototype.create = function (attachment) {
+        return __awaiter(this, void 0, Promise, function () {
+            var data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        data = prisma_attachment_mapper_1.PrismaAttachmentMapper.toPrisma(attachment);
+                        return [4 /*yield*/, this.prisma.attachment.create({
+                                data: data
                             })];
-                    case 2:
-                        _b.sent();
-                        _b.label = 3;
-                    case 3: return [2 /*return*/];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
     };
-    OnQuestionBestAnswerChosen = __decorate([
+    PrismaAttachmentsRepository = __decorate([
         common_1.Injectable()
-    ], OnQuestionBestAnswerChosen);
-    return OnQuestionBestAnswerChosen;
+    ], PrismaAttachmentsRepository);
+    return PrismaAttachmentsRepository;
 }());
-exports.OnQuestionBestAnswerChosen = OnQuestionBestAnswerChosen;
+exports.PrismaAttachmentsRepository = PrismaAttachmentsRepository;

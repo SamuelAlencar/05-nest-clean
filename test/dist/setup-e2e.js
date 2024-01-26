@@ -36,11 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-/* eslint-disable prettier/prettier */
-require("dotenv/config");
+var dotenv_1 = require("dotenv");
 var client_1 = require("@prisma/client");
 var node_crypto_1 = require("node:crypto");
 var node_child_process_1 = require("node:child_process");
+var domain_events_1 = require("@/core/events/domain-events");
+dotenv_1.config({ path: '.env', override: true });
+dotenv_1.config({ path: '.env.test', override: true });
 var prisma = new client_1.PrismaClient();
 function generateUniqueDatabaseURL(schemaId) {
     if (!process.env.DATABASE_URL) {
@@ -56,6 +58,7 @@ beforeAll(function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         databaseURL = generateUniqueDatabaseURL(schemaId);
         process.env.DATABASE_URL = databaseURL;
+        domain_events_1.DomainEvents.shouldRun = false;
         node_child_process_1.execSync('pnpm prisma migrate deploy');
         return [2 /*return*/];
     });

@@ -27,11 +27,13 @@ var attachments_repository_1 = require("@/domain/forum/application/repositories/
 var prisma_attachments_repository_1 = require("./prisma/repositories/prisma-attachments-repository");
 var prisma_notifications_repository_1 = require("./prisma/repositories/prisma-notifications-repository");
 var notifications_repository_1 = require("@/domain/notification/application/repositories/notifications-repository");
+var cache_module_1 = require("../cache/cache.module");
 var DatabaseModule = /** @class */ (function () {
     function DatabaseModule() {
     }
     DatabaseModule = __decorate([
         common_1.Module({
+            imports: [cache_module_1.CacheModule],
             providers: [
                 prisma_service_1.PrismaService,
                 {

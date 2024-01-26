@@ -42,47 +42,53 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.OnAnswerCreated = void 0;
-var domain_events_1 = require("@/core/events/domain-events");
-var answer_created_event_1 = require("@/domain/forum/enterprise/events/answer-created-event");
+exports.PrismaStudentsRepository = void 0;
 var common_1 = require("@nestjs/common");
-var OnAnswerCreated = /** @class */ (function () {
-    function OnAnswerCreated(questionsRepository, sendNotification) {
-        this.questionsRepository = questionsRepository;
-        this.sendNotification = sendNotification;
-        this.setupSubscriptions();
+var prisma_student_mapper_1 = require("../mappers/prisma-student-mapper");
+var PrismaStudentsRepository = /** @class */ (function () {
+    function PrismaStudentsRepository(prisma) {
+        this.prisma = prisma;
     }
-    OnAnswerCreated.prototype.setupSubscriptions = function () {
-        domain_events_1.DomainEvents.register(this.sendNewAnswerNotification.bind(this), answer_created_event_1.AnswerCreatedEvent.name);
-    };
-    OnAnswerCreated.prototype.sendNewAnswerNotification = function (_a) {
-        var answer = _a.answer;
-        return __awaiter(this, void 0, void 0, function () {
-            var question;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, this.questionsRepository.findById(answer.questionId.toString())];
+    PrismaStudentsRepository.prototype.findByEmail = function (email) {
+        return __awaiter(this, void 0, Promise, function () {
+            var student;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.user.findUnique({
+                            where: {
+                                email: email
+                            }
+                        })];
                     case 1:
-                        question = _b.sent();
-                        if (!question) return [3 /*break*/, 3];
-                        return [4 /*yield*/, this.sendNotification.execute({
-                                recipientId: question.authorId.toString(),
-                                title: "Nova resposta em \"" + question.title
-                                    .substring(0, 40)
-                                    .concat('...') + "\"",
-                                content: answer.excerpt
-                            })];
-                    case 2:
-                        _b.sent();
-                        _b.label = 3;
-                    case 3: return [2 /*return*/];
+                        student = _a.sent();
+                        if (!student) {
+                            return [2 /*return*/, null];
+                        }
+                        return [2 /*return*/, prisma_student_mapper_1.PrismaStudentMapper.toDomain(student)];
                 }
             });
         });
     };
-    OnAnswerCreated = __decorate([
+    PrismaStudentsRepository.prototype.create = function (student) {
+        return __awaiter(this, void 0, Promise, function () {
+            var data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        data = prisma_student_mapper_1.PrismaStudentMapper.toPrisma(student);
+                        return [4 /*yield*/, this.prisma.user.create({
+                                data: data
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    PrismaStudentsRepository = __decorate([
         common_1.Injectable()
-    ], OnAnswerCreated);
-    return OnAnswerCreated;
+    ], PrismaStudentsRepository);
+    return PrismaStudentsRepository;
 }());
-exports.OnAnswerCreated = OnAnswerCreated;
+exports.PrismaStudentsRepository = PrismaStudentsRepository;

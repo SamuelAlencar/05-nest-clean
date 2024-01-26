@@ -4,9 +4,6 @@ import { Env } from './env'
 
 @Injectable()
 export class EnvService {
-  static get() {
-      throw new Error('Method not implemented.')
-  }
   constructor(private configService: ConfigService<Env, true>) {}
 
   get<T extends keyof Env>(key: T) {
